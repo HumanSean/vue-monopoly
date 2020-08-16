@@ -1,32 +1,58 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+    <!-- <Header />
+    <Sidebar />
+    <Chat />
+    -->
     <router-view />
   </div>
 </template>
-
+<script>
+// import Header from '@/components/common/Header.vue';
+// import Sidebar from '@/components/common/Sidebar.vue';
+// import Chat from '@/components/common/Chat.vue';
+export default {
+  components: {
+    // Header,
+    // Sidebar,
+    // Chat
+  }
+};
+</script>
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-#nav {
-  padding: 30px;
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+}
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+h2.title {
+  display: inline-block;
+  background: teal;
+  color: #fafafa;
+  border-radius: 5px;
+  padding: 7px 13px;
+  font-weight: normal;
+}
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: teal;
+}
+
+.el-message-box__content {
+  color: #333;
 }
 </style>
