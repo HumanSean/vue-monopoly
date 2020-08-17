@@ -4,14 +4,19 @@
     <div class="sidebar">
       <GameLog :v="v" @change-speed="changeSpeed" />
       <PlayerInfo :players="players" />
-      <PlayArea :active-player="activePlayer" @move="playerMove" :v="v" />
+      <PlayArea
+        :active-player="activePlayer"
+        @move="playerMove"
+        :players="players"
+        :v="v"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { Player, Boxes } from "../../../utils/main";
-import { characters, maps, seq } from "../../../utils/data";
+import { Player, Boxes, Cards } from "../../../utils/main";
+import { characters, maps, seq, cardsMap } from "../../../utils/data";
 import Map from "./Map.vue";
 import PlayerInfo from "./Sidebar/PlayerInfo.vue";
 import PlayArea from "./Sidebar/PlayArea.vue";
@@ -51,6 +56,9 @@ export default {
   methods: {
     changeSpeed(v) {
       this.v = v;
+      this.players.forEach(player => {
+        player.v = v;
+      });
     },
     playerMove(player, steps) {
       player.move(steps, this.map, this.v);
@@ -121,10 +129,14 @@ export default {
     // 创建角色
     const { money, cards } = this.config;
     this.players = this.chrs.map((chr, index) => {
+      // 角色的node
       let node = document.createElement("img");
       node.src = require(`../../../assets/${chr.chr}.png`);
       node.style.zIndex = "1";
       node.className = "chr";
+      // 初始化道具卡
+      let arr = cards.map(card => new Cards[cardsMap[card]]({ name: card }));
+      let v = this.v;
       let player = new Player({
         ...chr, // name, chr(name), control
         color: characters[chr.chr].color,
@@ -138,9 +150,11 @@ export default {
         node,
         position: 0,
         direction: 0,
-        cards,
+        cards: arr,
         lands: [],
-        map: this.map
+        map: this.map,
+        v,
+        diceNum: 0
       });
       if (!index) player.cur = true;
       player.initiate(this.map);

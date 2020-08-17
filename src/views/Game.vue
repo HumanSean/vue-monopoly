@@ -22,7 +22,24 @@ export default {
         player: 1,
         npc: 1,
         money: 10000,
-        cards: ["随心卡"],
+        cards: [
+          "停留卡",
+          "转向卡",
+          "幸运卡",
+          "工资卡",
+          "加薪卡",
+          "爆破卡",
+          "升级卡",
+          "降级卡",
+          "买地卡",
+          "卖地卡",
+          "查税卡",
+          "抢劫卡",
+          "坐牢卡",
+          "住院卡",
+          "霉运卡",
+          "随心卡"
+        ],
         map: "classic",
         condition: "traditional",
         goal: 100000,
@@ -37,6 +54,16 @@ export default {
         {
           name: "玩家2",
           chr: "Batgirl",
+          control: 1
+        },
+        {
+          name: "玩家3",
+          chr: "Martian Manhunter",
+          control: 1
+        },
+        {
+          name: "玩家4",
+          chr: "Poison Ivy",
           control: 1
         }
       ]

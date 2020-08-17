@@ -50,7 +50,7 @@
       <el-form-item label="起始道具">
         <el-checkbox-group v-model="form.cards">
           <el-checkbox label="随心卡" name="type"></el-checkbox>
-          <el-checkbox label="路障卡" name="type"></el-checkbox>
+          <el-checkbox label="停留卡" name="type"></el-checkbox>
           <el-checkbox label="转向卡" name="type"></el-checkbox>
         </el-checkbox-group>
       </el-form-item>
@@ -105,7 +105,7 @@ export default {
         player: 1,
         npc: 1,
         money: 10000,
-        cards: ["随心卡"],
+        cards: ["停留卡"],
         map: "classic",
         condition: "traditional",
         goal: 100000,

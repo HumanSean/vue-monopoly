@@ -291,4 +291,23 @@ const maps = {
   classic
 };
 
-export { characters, maps, seq };
+const cardsMap = {
+  "停留卡": "StopCard",
+  "转向卡": "TurnCard",
+  "随心卡": "DiceCard",
+  "工资卡": "SalaryCard",
+  "加薪卡": "PromotionCard",
+  "查税卡": "TaxCard",
+  "幸运卡": "GoodluckCard",
+  "霉运卡": "BadluckCard",
+  "升级卡": "UpgradeCard",
+  "降级卡": "DowngradeCard",
+  "卖地卡": "SellCard",
+  "买地卡": "BuyCard",
+  "住院卡": "AmbulanceCard",
+  "坐牢卡": "PoliceCard",
+  "爆破卡": "ExplosionCard",
+  "抢劫卡": "RobCard",
+}
+
+export { characters, maps, seq, cardsMap };

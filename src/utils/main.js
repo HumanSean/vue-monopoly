@@ -25,7 +25,7 @@ class Player {
     map[this.position].node.append(this.node);
     gameLog.initiate(this.name, this.chr);
   }
-  move(num, map, v) {
+  move(num) {
     gameLog.log(this.chr + "掷出了点数" + num);
     for (let i = 0; i < num; i++) {
       setTimeout(() => {
@@ -44,11 +44,13 @@ class Player {
             this.getPaid();
           }
         }
-        map[this.position].node.append(this.node);
+        this.map[this.position].node.append(this.node);
         if (i === num - 1) {
-          switch (map[this.position].type) {
+          switch (this.map[this.position].type) {
             case "land":
-              gameLog.log(` ${this.chr} 来到了${map[this.position].name}。`);
+              gameLog.log(
+                ` ${this.chr} 来到了${this.map[this.position].name}。`
+              );
               break;
             case "fate":
               gameLog.log(` ${this.chr} 准备接受命运的审判。`);
@@ -80,10 +82,10 @@ class Player {
           }
           setTimeout(() => {
             // 这里执行动作，传入回调来执行之后操作
-            map[this.position].activate(this, this.checkNext.bind(this));
-          }, v);
+            this.map[this.position].activate(this, this.checkNext.bind(this));
+          }, this.v);
         }
-      }, v * i);
+      }, this.v * i);
     }
   }
   pay(value) {
@@ -93,13 +95,14 @@ class Player {
     }
   }
   bankrupt() {
-    this.lands.forEach(land => land.unpurchase(this));
+    for (let i = this.lands.length - 1; i >= 0; i--) {
+      this.lands[i].unpurchase();
+    }
     Message.error(
       `很遗憾， ${this.chr} 已无力经营下去，宣告破产，所有地产充公处理！`
     );
     this.state = "bankrupt";
     this.node.remove();
-    console.log(this);
   }
   getPaid() {
     // 发工资啦
@@ -123,7 +126,7 @@ class Player {
       Message(`离 ${this.chr} 出狱还有${this.stop}天！`);
     }
     if (this.state === "hospital") {
-      Message(`离 ${this.chr} 出狱还有${this.stop}天！`);
+      Message(`离 ${this.chr} 出院还有${this.stop}天！`);
     }
     if (!this.stop) {
       this.getActive();
@@ -280,10 +283,9 @@ class LandBox extends Box {
     this.node.firstElementChild.style.background = player.color;
     this.node.firstElementChild.style.borderColor = player.color;
   }
-  unpurchase(player) {
+  unpurchase() {
     // 撕毁合同
-    this.owner = "";
-    player.lands.splice(player.lands.indexOf(this), 1);
+    this.owner.lands.splice(this.owner.lands.indexOf(this), 1);
     // 移去标志
     if (!this.level) {
       this.img.remove();
@@ -293,6 +295,7 @@ class LandBox extends Box {
     this.node.style.border = "1px solid #454545";
     this.node.firstElementChild.style.background = "#454545";
     this.node.firstElementChild.style.borderColor = "#454545";
+    this.owner = "";
   }
   upgrade() {
     // 升级
@@ -305,15 +308,20 @@ class LandBox extends Box {
     }
     this.img.src = require(`../assets/house${this.level}.png`);
   }
-  downgradeLand(player) {
+  downgrade(explode) {
     // 降级
-    this.level--;
+    if (explode) {
+      // 爆破效果
+      this.level = 0;
+    } else {
+      this.level--;
+    }
     this.price = this.priceList[this.level];
     // 毁房子
     if (this.level === 0) {
       this.img.style.width = "40%";
       this.img.style.top = "60%";
-      this.img.src = require(`../assets/${player.chr}.png.png`);
+      this.img.src = require(`../assets/${this.owner.chr}.png.png`);
     } else {
       this.img.src = require(`../assets/house${this.level}.png`);
     }
@@ -372,7 +380,7 @@ class FateBox extends Box {
         this.loseLand(player);
         break;
       case num < 0.2:
-        this.downgradeLand(player);
+        this.downgradeLand();
         break;
       case num < 0.3:
         this.getSick(player);
@@ -449,7 +457,7 @@ class FateBox extends Box {
       return;
     }
     const land = player.lands[Math.floor(Math.random() * player.lands.length)];
-    land.unpurchase(player);
+    land.unpurchase();
     Message.error(
       ` ${player.chr} 因违规用地失去了在${land.name}的土地使用权！`
     );
@@ -463,7 +471,7 @@ class FateBox extends Box {
     }
     const land =
       availableLands[Math.floor(Math.random() * availableLands.length)];
-    land.downgradeLand();
+    land.downgrade();
     Message.error(` ${player.chr} 在${land.name}的房子因违建被拆除了一层！`);
     gameLog.log(` ${player.chr} 在${land.name}的房子因违建被拆除了一层！`);
   }
@@ -518,7 +526,7 @@ class FateBox extends Box {
     const fate = badFates[Math.floor(Math.random() * badFates.length)];
     Message.error(fate.content);
     gameLog.log(` ${player.chr} 的今日份霉运：${fate.content}`);
-    player.money.pay(fate.value);
+    player.pay(fate.value);
   }
 }
 class ChanceBox extends Box {
@@ -725,26 +733,70 @@ class CardBox extends Box {
   constructor(props) {
     super(props);
     this.items = [
-      { name: "停留卡", percentage: 7 },
-      { name: "随心卡", percentage: 6 },
-      { name: "路障卡", percentage: 7 },
-      { name: "转向卡", percentage: 8 },
-      { name: "升级卡", percentage: 6 },
-      { name: "买地卡", percentage: 2 },
-      { name: "福气卡", percentage: 5 },
-      { name: "幸运卡", percentage: 4 },
-      { name: "工资卡", percentage: 7 },
-      { name: "加薪卡", percentage: 4 },
-      { name: "地雷卡", percentage: 8 },
-      { name: "抢劫卡", percentage: 5 },
-      { name: "降级卡", percentage: 6 },
-      { name: "爆破卡", percentage: 2 },
-      { name: "住院卡", percentage: 5 },
-      { name: "坐牢卡", percentage: 5 },
-      { name: "嫁祸卡", percentage: 5 },
-      { name: "倒霉卡", percentage: 4 },
-      { name: "卖地卡", percentage: 2 },
-      { name: "查税卡", percentage: 2 }
+      {
+        name: "停留卡",
+        percentage: 8
+      },
+      {
+        name: "随心卡",
+        percentage: 10
+      },
+      {
+        name: "转向卡",
+        percentage: 8
+      },
+      {
+        name: "升级卡",
+        percentage: 6
+      },
+      {
+        name: "买地卡",
+        percentage: 2
+      },
+      {
+        name: "幸运卡",
+        percentage: 4
+      },
+      {
+        name: "工资卡",
+        percentage: 7
+      },
+      {
+        name: "加薪卡",
+        percentage: 7
+      },
+      {
+        name: "抢劫卡",
+        percentage: 5
+      },
+      {
+        name: "降级卡",
+        percentage: 6
+      },
+      {
+        name: "爆破卡",
+        percentage: 3
+      },
+      {
+        name: "住院卡",
+        percentage: 5
+      },
+      {
+        name: "坐牢卡",
+        percentage: 5
+      },
+      {
+        name: "倒霉卡",
+        percentage: 4
+      },
+      {
+        name: "卖地卡",
+        percentage: 2
+      },
+      {
+        name: "查税卡",
+        percentage: 2
+      }
     ];
     this.allItems = [];
     this.items.forEach(item => {
@@ -781,12 +833,396 @@ let Boxes = {
 };
 
 // 卡牌道具
-class Item {
+class Card {
   constructor(props) {
     Object.keys(props).forEach(key => {
       this[key] = props[key];
     });
   }
 }
+class StopCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "normal";
+    this.move = true;
+    this.src = "stop";
+  }
+  activate(player) {
+    Message.success(` ${player.chr} 使用了停留卡，今天是肥宅的一天。`);
+    gameLog.log(` ${player.chr} 使用了停留卡，今天是肥宅的一天。`);
+    setTimeout(() => {
+      player.map[player.position].activate(
+        player,
+        player.checkNext.bind(player)
+      );
+    }, player.v);
+  }
+}
+class TurnCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "normal";
+    this.move = false;
+    this.src = "turn";
+  }
+  activate(player) {
+    Message.success(` ${player.chr} 使用了转向卡，调转了方向。`);
+    gameLog.log(` ${player.chr} 使用了转向卡，调转了方向。`);
+    player.direction = player.direction ? 0 : 1;
+  }
+}
+class DiceCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "dice";
+    this.move = false;
+    this.src = "dice";
+  }
+  activate(player, val) {
+    Message.success(` ${player.chr} 使用了随心卡，许愿了点数${val}。`);
+    gameLog.log(` ${player.chr} 使用了随心卡，许愿了点数${val}。`);
+    player.diceNum = val;
+  }
+}
+class SalaryCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "normal";
+    this.move = false;
+    this.src = "salary";
+  }
+  activate(player) {
+    Message.success(
+      ` ${player.chr} 使用了工资卡，获得了本月薪水$${player.salary}。`
+    );
+    gameLog.log(
+      ` ${player.chr} 使用了工资卡，获得了本月薪水$${player.salary}。`
+    );
+    player.money += player.salary;
+  }
+}
+class PromotionCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "normal";
+    this.move = false;
+    this.src = "promotion";
+  }
+  activate(player) {
+    Message.success(` ${player.chr} 使用了加薪卡，薪水提升$1000。`);
+    gameLog.log(` ${player.chr} 使用了加薪卡，薪水提升$1000。`);
+    player.salary += 1000;
+  }
+}
+class PoliceCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "chr";
+    this.move = false;
+    this.src = "police";
+    this.check = true;
+  }
+  activate(selectedPlayer, activePlayer) {
+    let num = Math.ceil(Math.random() * 3);
+    selectedPlayer.stop = 3;
+    selectedPlayer.getBusted();
+    Message.success(
+      ` ${activePlayer.chr} 举报 ${selectedPlayer.chr} 逃税成功，${selectedPlayer.chr}收监反省${num}天, ${activePlayer.chr}获得赏金$1000！`
+    );
+    gameLog.log(
+      ` ${activePlayer.chr} 举报 ${selectedPlayer.chr} 逃税成功，${selectedPlayer.chr}收监反省${num}天, ${activePlayer.chr}获得赏金$1000！`
+    );
+    activePlayer.money += 1000;
+  }
+}
+class AmbulanceCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "chr";
+    this.move = false;
+    this.src = "ambulance";
+    this.check = true;
+  }
+  activate(selectedPlayer, activePlayer) {
+    let num = Math.ceil(Math.random() * 3);
+    selectedPlayer.stop = 3;
+    selectedPlayer.getSick();
+    Message.success(
+      ` ${activePlayer.chr} 在混乱中打伤了 ${selectedPlayer.chr}，${selectedPlayer.chr}住院休养${num}天, ${activePlayer.chr}赔偿医药费$1000！`
+    );
+    gameLog.log(
+      ` ${activePlayer.chr} 在混乱中打伤了 ${selectedPlayer.chr}，${selectedPlayer.chr}住院休养${num}天, ${activePlayer.chr}赔偿医药费$1000！`
+    );
+    activePlayer.pay(1000);
+  }
+}
+class ExplosionCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "normal";
+    this.move = false;
+    this.src = "explosion";
+  }
+  activate(player) {
+    const land = player.map[player.position];
+    Message.success(
+      ` ${player.chr} 使用了爆破卡，${land.owner.chr}在${land.name}的房子被炸得渣都不剩。`
+    );
+    gameLog.log(
+      ` ${player.chr} 使用了爆破卡，${land.owner.chr}在${land.name}的房子被炸得渣都不剩。`
+    );
+    land.downgrade(true);
+  }
+  checkBan(player) {
+    const land = player.map[player.position];
+    if (
+      land.type === "land" &&
+      land.level > 0 &&
+      land.owner &&
+      land.owner !== player
+    ) {
+      return false;
+    }
+    return true;
+  }
+}
+class UpgradeCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "normal";
+    this.move = false;
+    this.src = "upgrade";
+  }
+  activate(player) {
+    const land = player.map[player.position];
+    Message.success(
+      ` ${player.chr} 使用了升级卡，给${land.name}盖了一层房子。`
+    );
+    gameLog.log(` ${player.chr} 使用了升级卡，给${land.name}盖了一层房子。`);
+    land.upgrade();
+  }
+  checkBan(player) {
+    const land = player.map[player.position];
+    if (land.type === "land" && land.level < 3 && land.owner === player) {
+      return false;
+    }
+    return true;
+  }
+}
+class DowngradeCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "normal";
+    this.move = false;
+    this.src = "downgrade";
+  }
+  activate(player) {
+    const land = player.map[player.position];
+    Message.success(
+      ` ${player.chr} 使用了降级卡，给 ${land.owner.chr} 在${land.name}的房子拆了一层。`
+    );
+    gameLog.log(
+      ` ${player.chr} 使用了降级卡，给 ${land.owner.chr} 在${land.name}的房子拆了一层。`
+    );
+    land.downgrade();
+  }
+  checkBan(player) {
+    const land = player.map[player.position];
+    if (
+      land.type === "land" &&
+      land.level > 0 &&
+      land.owner &&
+      land.owner !== player
+    ) {
+      return false;
+    }
+    return true;
+  }
+}
+class RobCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "chr";
+    this.move = false;
+    this.src = "rob";
+  }
+  activate(selectedPlayer, activePlayer) {
+    if (!selectedPlayer.cards.length) {
+      Message.error(
+        ` ${activePlayer.chr} 掏出了手枪准备抢劫却发现 ${selectedPlayer.chr} 口袋里一张卡片都没有！`
+      );
+      gameLog.log(
+        ` ${activePlayer.chr} 掏出了手枪准备抢劫却发现 ${selectedPlayer.chr} 口袋里一张卡片都没有！`
+      );
+      return;
+    }
+    let index = Math.floor(Math.random() * selectedPlayer.cards.length);
+    let card = selectedPlayer.cards[index];
+    selectedPlayer.cards.splice(index, 1);
+    activePlayer.cards.push(card);
+    Message.error(
+      ` ${activePlayer.chr} 使用了抢劫卡，抢走了 ${selectedPlayer.chr} 口袋里的${card.name}！`
+    );
+    gameLog.log(
+      ` ${activePlayer.chr} 使用了抢劫卡，抢走了 ${selectedPlayer.chr} 口袋里的${card.name}！`
+    );
+  }
+}
+class TaxCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "chr";
+    this.move = false;
+    this.src = "tax";
+  }
+  activate(player) {
+    Message.success(
+      ` ${player.chr} 被查税后补缴纳了$${player.money / 5}给政府！`
+    );
+    gameLog.log(` ${player.chr} 被查税后补缴纳了$${player.money / 5}给政府！`);
+    player.pay(player.money / 5);
+  }
+}
+class SellCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "normal";
+    this.move = false;
+    this.src = "sell";
+  }
+  activate(player) {
+    const land = player.map[player.position];
+    const price = land.value + land.price;
+    Message.success(
+      ` ${player.chr} 使用了卖地卡，以售价$${price}卖掉了 ${land.owner.chr} 在${land.name}的地。`
+    );
+    gameLog.log(
+      ` ${player.chr} 使用了卖地卡，以售价$${price}卖掉了 ${land.owner.chr} 在${land.name}的地。`
+    );
+    land.owner.money += price;
+    land.unpurchase();
+  }
+  checkBan(player) {
+    const land = player.map[player.position];
+    if (land.type === "land" && land.owner) {
+      return false;
+    }
+    return true;
+  }
+  checkMoney(player) {
+    const land = player.map[player.position];
+    const price = land.value + land.price;
+    return `是否以$${price}卖掉$ {land.owner.chr} 在${land.name}的地盘？`;
+  }
+}
+class BuyCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "normal";
+    this.move = false;
+    this.src = "buy";
+  }
+  activate(player) {
+    const land = player.map[player.position];
+    const price = land.owner ? land.value + land.price : land.value;
+    let msg = land.owner ? ` ${land.owner.chr} 在` : "";
+    Message.success(
+      ` ${player.chr} 使用了买地卡，花费了$${price}买下了${msg}${land.name}的地盘。`
+    );
+    gameLog.log(
+      ` ${player.chr} 使用了买地卡，花费了$${price}买下了${msg}${land.name}的地盘。`
+    );
+    if (land.owner) land.owner.money += price;
+    player.pay(price);
+    if (land.owner) {
+      land.unpurchase();
+    }
+    land.purchase(player);
+  }
+  checkBan(player) {
+    const land = player.map[player.position];
+    if (land.type === "land" && land.owner !== player) {
+      return false;
+    }
+    return true;
+  }
+  checkMoney(player) {
+    const land = player.map[player.position];
+    const price = land.owner ? land.value + land.price : land.value;
+    if (player.money < price) return false;
+    if (land.owner) {
+      return `强行盘下 ${land.owner.chr} 在${land.name}的地盘需花费$${price}，是否确定？`;
+    } else {
+      return `该地盘尚未有主，花费$${price}盘下来？`;
+    }
+  }
+}
+class GoodluckCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "normal";
+    this.move = false;
+    this.src = "goodluck";
+  }
+  activate(player) {
+    player.luck += 0.1;
+    Message.success(
+      ` ${player.chr} 使用了幸运卡，自身幸运值提升了10%，达到了${player.luck *
+        100}%`
+    );
+    gameLog.log(
+      ` ${player.chr} 使用了幸运卡，自身幸运值提升了10%，达到了${player.luck *
+        100}%`
+    );
+  }
+}
+class BadluckCard extends Card {
+  constructor(props) {
+    super(props);
+    this.type = "chr";
+    this.move = false;
+    this.src = "badluck";
+  }
+  activate(selectedPlayer, activePlayer) {
+    if (selectedPlayer.luck < 0.1) {
+      Message.success(
+        ` ${activePlayer.chr} 使用了霉运卡， 但是 ${selectedPlayer.chr} 已经够倒霉了，霉运卡都无效了。`
+      );
+      Message.success(
+        ` ${activePlayer.chr} 使用了霉运卡， 但是 ${selectedPlayer.chr} 已经够倒霉了，霉运卡都无效了。`
+      );
+      return;
+    }
+    selectedPlayer.luck -= 0.1;
+    Message.success(
+      ` ${activePlayer.chr} 使用了霉运卡， ${
+        selectedPlayer.chr
+      } 的幸运值下降了10%，现在为${selectedPlayer.luck * 100}%。`
+    );
+    gameLog.log(
+      ` ${activePlayer.chr} 使用了霉运卡， ${
+        selectedPlayer.chr
+      } 的幸运值下降了10%，现在为${selectedPlayer.luck * 100}%。`
+    );
+  }
+}
 
-export { Player, Boxes, Item, gameLog };
+const Cards = {
+  StopCard,
+  TurnCard,
+  DiceCard,
+  SalaryCard,
+  PromotionCard,
+  PoliceCard,
+  AmbulanceCard,
+  ExplosionCard,
+  UpgradeCard,
+  DowngradeCard,
+  RobCard,
+  TaxCard,
+  SellCard,
+  BuyCard,
+  GoodluckCard,
+  BadluckCard
+};
+export { Player, Boxes, Cards, gameLog };
