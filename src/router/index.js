@@ -27,8 +27,7 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  mode: "history",
-  base: "./game/vue-monopoly",
+  mode: "hash",
   routes
 });
 
