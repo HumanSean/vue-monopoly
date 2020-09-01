@@ -58,6 +58,8 @@ export default {
           this.characters.pop();
         }
         this.writeName(player);
+      } else {
+        this.writeName(player);
       }
     },
     writeName(player) {

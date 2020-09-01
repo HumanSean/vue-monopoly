@@ -1,40 +1,140 @@
 <template>
   <div class="player-info">
-    <el-card
-      :body-style="{ padding: '0px' }"
-      :style="{ borderColor: players[0] ? players[0].color : '#fa4545' }"
+    <!-- 当前屏幕的主玩家 -->
+    <el-popover
+      placement="right"
+      width="260"
+      trigger="hover"
+      popper-class="player-info"
     >
-      <h2 :style="{ background: players[0] ? players[0].color : '#454545' }">
-        {{ players[0] && players[0].chr }}
-      </h2>
-      <img
-        :src="players[0] && require(`../../../../assets/${players[0].chr}.png`)"
-      />
-      <div>
-        <el-button
-          type="primary"
-          icon="el-icon-refresh"
-          size="small"
-        ></el-button>
-        <h3>${{ players[0] && players[0].money }}</h3>
-      </div>
-    </el-card>
+      <el-form v-if="players[0]" label-width="50px" label-position="left">
+        <el-form-item class="fixed" label="昵称">
+          {{ players[0].name }}
+        </el-form-item>
+        <el-form-item class="fixed" label="角色">
+          {{ players[0].chr }}
+        </el-form-item>
+        <el-form-item class="fixed" label="现金">
+          ${{ players[0].money }}
+        </el-form-item>
+        <el-form-item class="fixed" label="资产">
+          ${{ calTotal(players[0]) }}
+        </el-form-item>
+        <el-form-item class="fixed" label="薪水">
+          ${{ players[0].salary }}
+        </el-form-item>
+        <el-form-item class="fixed" label="状态">
+          {{ stateMap[players[0].state] }}
+        </el-form-item>
+        <el-form-item class="fixed" label="幸运">
+          {{ players[0].luck * 100 }}%
+        </el-form-item>
+        <el-form-item class="fixed" label="方向">
+          {{ directionMap[players[0].direction] }}
+        </el-form-item>
+        <el-form-item label="道具">
+          <template v-if="players[0].cards.length">
+            {{ players[0].cards.map(card => card.name).join(" | ") }}
+          </template>
+          <template v-else>空空如也</template>
+        </el-form-item>
+        <el-form-item label="地产">
+          <template v-if="players[0].lands.length">
+            {{ players[0].lands.map(land => land.name).join(" | ") }}
+          </template>
+          <template v-else>无家可归</template>
+        </el-form-item>
+      </el-form>
+      <el-card
+        slot="reference"
+        :body-style="{ padding: '0px' }"
+        :style="{ borderColor: players[0] ? players[0].color : '#fa4545' }"
+      >
+        <h2 :style="{ background: players[0] ? players[0].color : '#454545' }">
+          {{ players[0] && players[0].chr }}
+        </h2>
+        <img
+          :src="
+            players[0] && require(`../../../../assets/${players[0].chr}.png`)
+          "
+        />
+        <div>
+          <img
+            class="logo"
+            :src="
+              players[0] &&
+                require(`../../../../assets/${players[0].chr}.png.png`)
+            "
+          />
+          <h3>${{ players[0] && players[0].money }}</h3>
+        </div>
+      </el-card>
+    </el-popover>
+
+    <!-- 另外的玩家 -->
     <div class="grid">
-      <div
-        class="box"
+      <el-popover
+        placement="right"
+        width="260"
+        trigger="hover"
+        popper-class="player-info"
         v-for="i in 3"
         :key="i"
-        :style="{ borderColor: players[i] ? players[i].color : '#ddd' }"
+        :disabled="!players[i]"
       >
-        <h4 v-if="players[i]">${{ players[i].money }}</h4>
-        <img
-          class="chr"
-          v-if="players[i]"
-          :src="require(`../../../../assets/${players[i].chr}.png`)"
-          alt
-        />
-        <img v-else :src="require('../../../../assets/null.png')" alt="" />
-      </div>
+        <el-form v-if="players[i]" label-width="60px" label-position="left">
+          <el-form-item class="fixed" label="昵称">
+            {{ players[i].name }}
+          </el-form-item>
+          <el-form-item class="fixed" label="角色">
+            {{ players[i].chr }}
+          </el-form-item>
+          <el-form-item class="fixed" label="现金">
+            ${{ players[i].money }}
+          </el-form-item>
+          <el-form-item class="fixed" label="资产">
+            ${{ calTotal(players[i]) }}
+          </el-form-item>
+          <el-form-item class="fixed" label="薪水">
+            ${{ players[i].salary }}
+          </el-form-item>
+          <el-form-item class="fixed" label="状态">
+            {{ stateMap[players[i].state] }}
+          </el-form-item>
+          <el-form-item class="fixed" label="幸运">
+            {{ players[i].luck * 100 }}%
+          </el-form-item>
+          <el-form-item class="fixed" label="方向">
+            {{ directionMap[players[i].direction] }}
+          </el-form-item>
+          <el-form-item label="道具">
+            <template v-if="players[i].cards.length">
+              {{ players[i].cards.map(card => card.name).join(" | ") }}
+            </template>
+            <template v-else>空空如也</template>
+          </el-form-item>
+          <el-form-item label="地产">
+            <template v-if="players[i].lands.length">
+              {{ players[i].lands.map(land => land.name).join(" | ") }}
+            </template>
+            <template v-else>无家可归</template>
+          </el-form-item>
+        </el-form>
+        <div
+          slot="reference"
+          class="box"
+          :style="{ borderColor: players[i] ? players[i].color : '#ddd' }"
+        >
+          <h4 v-if="players[i]">${{ players[i].money }}</h4>
+          <img
+            class="chr"
+            v-if="players[i]"
+            :src="require(`../../../../assets/${players[i].chr}.png`)"
+            alt
+          />
+          <img v-else :src="require('../../../../assets/null.png')" alt />
+        </div>
+      </el-popover>
     </div>
   </div>
 </template>
@@ -45,6 +145,29 @@ export default {
     players: {
       type: Array,
       required: true
+    }
+  },
+  data() {
+    return {
+      stateMap: {
+        active: "活跃中",
+        hospital: "住院中",
+        jail: "坐牢中",
+        bankrupt: "破产"
+      },
+      directionMap: ["逆时针", "顺时针"]
+    };
+  },
+  methods: {
+    calTotal(player) {
+      if (player.lands.length) {
+        let landValue = player.lands
+          .map(land => land.value + land.price)
+          .reduce((acc, cur) => acc + cur);
+        return player.money + landValue;
+      } else {
+        return player.money;
+      }
     }
   }
 };
@@ -60,17 +183,17 @@ export default {
   }
   .el-card {
     & {
+      position: relative;
       width: 70%;
       border-radius: 5px;
       border: 2px solid #454545;
       box-sizing: border-box;
+      cursor: pointer;
     }
     h2 {
       font-size: 18px;
       padding: 10px 0;
       text-align: center;
-      border-top-left-radius: 3px;
-      border-top-right-radius: 3px;
       color: #fafafa;
       height: 30px;
       line-height: 30px;
@@ -89,6 +212,12 @@ export default {
       width: 80%;
       transform: scale(0.95);
     }
+    img.logo {
+      position: absolute;
+      width: 52px;
+      left: calc(100% - 55px);
+      bottom: 0px;
+    }
   }
   .grid {
     & {
@@ -101,6 +230,10 @@ export default {
       grid-template-columns: 1fr;
       grid-template-rows: repeat(3, 1fr);
       gap: 15px;
+    }
+    span {
+      overflow: hidden;
+      cursor: pointer;
     }
     .box {
       & {
@@ -133,6 +266,21 @@ export default {
         top: 0;
         transform: scale(1);
       }
+    }
+  }
+}
+::v-deep .el-form-item {
+  & {
+    margin-bottom: 0;
+  }
+  &.fixed {
+    height: 30px;
+    line-height: 30px;
+    .el-form-item__label {
+      line-height: 30px;
+    }
+    .el-form-item__content {
+      line-height: 30px;
     }
   }
 }

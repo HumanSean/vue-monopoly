@@ -23,6 +23,7 @@ export default {
 * {
   margin: 0;
   padding: 0;
+  user-select: none;
   outline: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -52,7 +53,13 @@ h2.title {
   background: teal;
 }
 
+.el-tag {
+  cursor: pointer;
+}
 .el-message-box__content {
   color: #333;
+}
+.el-popover.center {
+  text-align: center;
 }
 </style>

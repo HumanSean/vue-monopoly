@@ -1,8 +1,12 @@
 <template>
   <div class="game-area">
-    <Map ref="map" />
+    <Map ref="map" :map="map" />
     <div class="sidebar">
-      <GameLog :v="v" @change-speed="changeSpeed" />
+      <GameLog
+        :active-player="activePlayer"
+        :v="v"
+        @change-speed="changeSpeed"
+      />
       <PlayerInfo :players="players" />
       <PlayArea
         :active-player="activePlayer"
@@ -43,7 +47,7 @@ export default {
   data() {
     return {
       // 此处管理所有数据
-      v: 300,
+      v: 800,
       map: [],
       players: []
     };
@@ -64,7 +68,6 @@ export default {
       player.move(steps, this.map, this.v);
     }
   },
-  created() {},
   mounted() {
     // 创建地图
     let map = maps[this.config.map];
@@ -126,6 +129,14 @@ export default {
       }
       return box;
     });
+    this.map.day = 0;
+
+    if (this.config.condition === "goal") {
+      this.map.goal = this.config.goal;
+    } else if (this.config.condition === "time") {
+      this.map.dayLimit = this.config.day;
+    }
+
     // 创建角色
     const { money, cards } = this.config;
     this.players = this.chrs.map((chr, index) => {
@@ -156,7 +167,10 @@ export default {
         v,
         diceNum: 0
       });
-      if (!index) player.cur = true;
+      if (!index) {
+        player.cur = true;
+        player.flag = true;
+      }
       player.initiate(this.map);
       return player;
     });

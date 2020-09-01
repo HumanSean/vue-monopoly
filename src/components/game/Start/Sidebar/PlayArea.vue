@@ -1,8 +1,10 @@
 <template>
   <div class="play-area">
+    <!-- 当前回合玩家 -->
     <h2 :style="{ background: activeColor }">
       {{ activePlayer && activePlayer.chr }}
     </h2>
+    <!-- 操作区 -->
     <div class="control">
       <div class="dice">
         <img :src="diceImg" alt />
@@ -12,7 +14,10 @@
           type="primary"
           @click="roll"
           :disabled="moved"
-          :style="{ background: activeColor }"
+          :style="{
+            background: activeColor,
+            filter: moved ? 'grayscale(1)' : ''
+          }"
           >掷骰子</el-button
         >
         <br />
@@ -20,25 +25,36 @@
           type="primary"
           @click="showItems"
           :disabled="moved"
-          :style="{ background: activeColor }"
+          :style="{
+            background: activeColor,
+            filter: moved ? 'grayscale(1)' : ''
+          }"
           >使用道具</el-button
         >
       </div>
     </div>
     <el-dialog title="道具栏" :visible.sync="dialogVisible" width="800px">
       <div class="grid" v-if="activePlayer">
-        <div
-          class="box"
-          :class="{ ban: card.checkBan && card.checkBan(activePlayer) }"
-          @click="useItem(card)"
+        <el-popover
+          placement="top-start"
+          width="200"
+          trigger="hover"
           v-for="(card, index) in activePlayer.cards"
           :key="index"
         >
-          <div>
-            <img :src="cardImgs[card.src]" alt />
-            <h4>{{ card.name }}</h4>
+          {{ card.detail }}
+          <div
+            class="box"
+            :class="{ ban: card.checkBan && card.checkBan(activePlayer) }"
+            @click="useItem(card)"
+            slot="reference"
+          >
+            <div>
+              <img :src="cardImgs[card.src]" alt />
+              <h4>{{ card.name }}</h4>
+            </div>
           </div>
-        </div>
+        </el-popover>
       </div>
       <div slot="footer">
         <el-button @click="dialogVisible = false">返 回</el-button>
@@ -57,10 +73,7 @@
           }"
         >
           <div>
-            <img
-              :src="require(`../../../../assets/${player.chr}.png`)"
-              alt=""
-            />
+            <img :src="require(`../../../../assets/${player.chr}.png`)" alt />
             <h4>{{ player.chr }}</h4>
           </div>
         </div>
@@ -71,15 +84,11 @@
             chrDialog = false;
             selectedPlayer = null;
           "
+          >返 回</el-button
         >
-          返 回
-        </el-button>
-        <el-button
-          @click="useChrItem(card)"
-          :disabled="selectedPlayer === null"
+        <el-button @click="useChrItem(card)" :disabled="selectedPlayer === null"
+          >确 定</el-button
         >
-          确 定
-        </el-button>
       </div>
     </el-dialog>
     <el-dialog title="请选择点数" :visible.sync="diceDialog" width="800px">
@@ -94,7 +103,7 @@
           }"
         >
           <div>
-            <img :src="require(`../../../../assets/${i}.jpg`)" alt="" />
+            <img :src="require(`../../../../assets/${i}.jpg`)" alt />
           </div>
         </div>
       </div>
@@ -104,12 +113,11 @@
             diceDialog = false;
             selectedDice = 0;
           "
+          >返 回</el-button
         >
-          返 回
-        </el-button>
-        <el-button @click="useDiceItem(card)" :disabled="!selectedDice">
-          确 定
-        </el-button>
+        <el-button @click="useDiceItem(card)" :disabled="!selectedDice"
+          >确 定</el-button
+        >
       </div>
     </el-dialog>
   </div>
@@ -183,12 +191,50 @@ export default {
       let arr = [...this.players];
       arr.splice(arr.indexOf(this.activePlayer), 1);
       return arr;
+    },
+    otherActivePlayers() {
+      let arr = [...this.players];
+      arr.splice(arr.indexOf(this.activePlayer), 1);
+      arr.sort((a, b) => b.money - a.money);
+      return arr.filter(player => player.state === "active");
     }
   },
   watch: {
-    activePlayer(n) {
-      this.moved = !!n.stop;
-      this.activeColor = n.color;
+    activePlayer(player) {
+      this.activeColor = player.color;
+
+      if (player.state !== "active") {
+        this.moved = true;
+      } else {
+        // 解锁下名玩家
+        this.moved = false;
+
+        // 电脑逻辑
+        if (!player.control) {
+          this.moved = true;
+          if (player.cards.length) {
+            if (Math.random() > 0.4) {
+              // 使用道具
+              let result = player.useCard(this.otherActivePlayers);
+              if (result === "moved") {
+                // 移动过了
+              } else if (result) {
+                // 使用失败
+                this.roll();
+              } else {
+                setTimeout(() => {
+                  this.roll();
+                }, 1000);
+              }
+            } else {
+              this.roll();
+            }
+          } else {
+            // 掷骰子
+            this.roll();
+          }
+        }
+      }
     }
   },
   methods: {

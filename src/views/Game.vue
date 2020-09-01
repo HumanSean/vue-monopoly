@@ -1,7 +1,10 @@
 <template>
   <div class="game">
-    <Setting v-if="gameStarted" @game-start="gameStart" />
-    <GameArea v-else :config="config" :chrs="chrs" />
+    <div class="container" v-if="isPc">
+      <Setting v-if="!gameStarted" @game-start="gameStart" />
+      <GameArea v-else :config="config" :chrs="chrs" />
+    </div>
+    <div v-else>请用电脑版的Chrome打开</div>
   </div>
 </template>
 
@@ -16,6 +19,7 @@ export default {
   },
   data() {
     return {
+      isPc: window.innerWidth > 888,
       gameStarted: false,
       config: {
         // reject: false,
@@ -42,8 +46,8 @@ export default {
         ],
         map: "classic",
         condition: "traditional",
-        goal: 100000,
-        day: 90
+        goal: 12000,
+        day: 3
       },
       chrs: [
         {
@@ -54,17 +58,7 @@ export default {
         {
           name: "玩家2",
           chr: "Batgirl",
-          control: 1
-        },
-        {
-          name: "玩家3",
-          chr: "Martian Manhunter",
-          control: 1
-        },
-        {
-          name: "玩家4",
-          chr: "Poison Ivy",
-          control: 1
+          control: 0
         }
       ]
     };
@@ -80,7 +74,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.game {
+.game,
+.container {
   width: 100%;
   height: 100%;
 }

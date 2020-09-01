@@ -61,7 +61,7 @@
       </el-form-item>
       <el-form-item label="胜利条件">
         <el-select v-model="form.condition">
-          <el-option label="所有玩家破产" value="traditional"></el-option>
+          <el-option label="所有其他玩家破产" value="traditional"></el-option>
           <el-option label="达到指定资产" value="goal"></el-option>
           <el-option label="指定天数资产最多" value="time"></el-option>
         </el-select>

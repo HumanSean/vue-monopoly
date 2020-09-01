@@ -80,7 +80,8 @@ const classic = [
     type: "empty",
     owner: "system",
     value: 0,
-    src: "salary"
+    src: "salary",
+    detail: "这里游戏的起点，每次经过都有工资可以领取哦！"
   },
   {
     name: "中国",
@@ -115,35 +116,43 @@ const classic = [
     type: "fate",
     owner: "system",
     value: 0,
-    src: "fate"
+    src: "fate",
+    detail:
+      "房产？金钱？厄运？到底有什么在命运之格等着你呢？（幸运值越大，遇见好事情的概率越大！）"
   },
   {
     name: "白云机场",
     type: "air",
     owner: "system",
     value: 800,
-    src: "airport"
+    src: "airport",
+    detail:
+      "坐落在广州白云区的白云机场，每天迎接着四面八方到来的人，你想去哪里呢？（飞机票$800一张）"
   },
   {
     name: "交所得税",
     type: "bad",
     owner: "system",
     value: 500,
-    src: "tax"
+    src: "tax",
+    detail: "依法纳税是每位公民应尽的义务，今天你纳税了吗？"
   },
   {
     name: "机会",
     type: "chance",
     owner: "system",
     value: 0,
-    src: "chance"
+    src: "chance",
+    detail:
+      "升职加薪？卡片道具？到底有什么机会在前方等着你呢？（幸运值越大，遇见好事情的概率越大！）"
   },
   {
     name: "监狱",
     type: "jail",
     owner: "system",
     value: 0,
-    src: "jail"
+    src: "jail",
+    detail: "关押犯人的地方。这年头越来越多的人偷税漏税被抓了。"
   },
   {
     name: "巴西",
@@ -171,7 +180,8 @@ const classic = [
     type: "card",
     owner: "system",
     value: 0,
-    src: "shop"
+    src: "shop",
+    detail: "这里更是考验你人品的地方！每花费$1000皆有可能抽中一张道具卡片！"
   },
   {
     name: "美国",
@@ -192,14 +202,17 @@ const classic = [
     type: "chance",
     owner: "system",
     value: 0,
-    src: "chance"
+    src: "chance",
+    detail:
+      "升职加薪？卡片道具？到底有什么机会在前方等着你呢？（幸运值越大，遇见好事情的概率越大！）"
   },
   {
     name: "捡到钱",
     type: "good",
     owner: "system",
     value: 500,
-    src: "gold"
+    src: "gold",
+    detail: "快看！飞机！"
   },
   {
     name: "意大利",
@@ -220,21 +233,25 @@ const classic = [
     type: "fate",
     owner: "system",
     value: 0,
-    src: "fate"
+    src: "fate",
+    detail:
+      "房产？金钱？厄运？到底有什么在命运之格等着你呢？（幸运值越大，遇见好事情的概率越大！）"
   },
   {
     name: "伦敦机场",
     type: "air",
     owner: "system",
     value: 800,
-    src: "airport"
+    src: "airport",
+    detail: "远渡重洋的你，是否想坐一趟飞机回国了呢？（飞机票$800一张）"
   },
   {
     name: "医院",
     type: "hospital",
     owner: "system",
     value: 0,
-    src: "hospital"
+    src: "hospital",
+    detail: "体检住院一条龙服务，客官还需要些啥呢？"
   },
   {
     name: "英国",
@@ -259,55 +276,148 @@ const classic = [
   }
 ];
 
-let seq = [
-  16,
-  17,
-  18,
-  19,
-  20,
-  21,
-  22,
-  23,
-  24,
-  25,
-  15,
-  13,
-  11,
-  9,
-  8,
-  7,
-  6,
-  5,
-  4,
-  3,
-  2,
-  1,
-  0,
-  10,
-  12,
-  14
-];
+let seq = {
+  0: 16,
+  1: 17,
+  2: 18,
+  3: 19,
+  4: 20,
+  5: 21,
+  6: 22,
+  7: 23,
+  8: 24,
+  9: 25,
+  10: 15,
+  11: 13,
+  12: 11,
+  13: 9,
+  14: 8,
+  15: 7,
+  16: 6,
+  17: 5,
+  18: 4,
+  19: 3,
+  20: 2,
+  21: 1,
+  22: 0,
+  23: 10,
+  24: 12,
+  25: 14
+};
+let reverseSeq = {
+  16: 0,
+  17: 1,
+  18: 2,
+  19: 3,
+  20: 4,
+  21: 5,
+  22: 6,
+  23: 7,
+  24: 8,
+  25: 9,
+  15: 10,
+  13: 11,
+  11: 12,
+  9: 13,
+  8: 14,
+  7: 15,
+  6: 16,
+  5: 17,
+  4: 18,
+  3: 19,
+  2: 20,
+  1: 21,
+  0: 22,
+  10: 23,
+  12: 24,
+  14: 25
+};
 const maps = {
   classic
 };
 
 const cardsMap = {
-  "停留卡": "StopCard",
-  "转向卡": "TurnCard",
-  "随心卡": "DiceCard",
-  "工资卡": "SalaryCard",
-  "加薪卡": "PromotionCard",
-  "查税卡": "TaxCard",
-  "幸运卡": "GoodluckCard",
-  "霉运卡": "BadluckCard",
-  "升级卡": "UpgradeCard",
-  "降级卡": "DowngradeCard",
-  "卖地卡": "SellCard",
-  "买地卡": "BuyCard",
-  "住院卡": "AmbulanceCard",
-  "坐牢卡": "PoliceCard",
-  "爆破卡": "ExplosionCard",
-  "抢劫卡": "RobCard",
-}
-
-export { characters, maps, seq, cardsMap };
+  停留卡: "StopCard",
+  转向卡: "TurnCard",
+  随心卡: "DiceCard",
+  工资卡: "SalaryCard",
+  加薪卡: "PromotionCard",
+  查税卡: "TaxCard",
+  幸运卡: "GoodluckCard",
+  霉运卡: "BadluckCard",
+  升级卡: "UpgradeCard",
+  降级卡: "DowngradeCard",
+  卖地卡: "SellCard",
+  买地卡: "BuyCard",
+  住院卡: "AmbulanceCard",
+  坐牢卡: "PoliceCard",
+  爆破卡: "ExplosionCard",
+  抢劫卡: "RobCard"
+};
+const cardsChance = [
+  {
+    name: "停留卡",
+    percentage: 13
+  },
+  {
+    name: "随心卡",
+    percentage: 13
+  },
+  {
+    name: "转向卡",
+    percentage: 13
+  },
+  {
+    name: "升级卡",
+    percentage: 6
+  },
+  {
+    name: "买地卡",
+    percentage: 2
+  },
+  {
+    name: "幸运卡",
+    percentage: 4
+  },
+  {
+    name: "工资卡",
+    percentage: 7
+  },
+  {
+    name: "加薪卡",
+    percentage: 7
+  },
+  {
+    name: "抢劫卡",
+    percentage: 5
+  },
+  {
+    name: "降级卡",
+    percentage: 6
+  },
+  {
+    name: "爆破卡",
+    percentage: 3
+  },
+  {
+    name: "住院卡",
+    percentage: 5
+  },
+  {
+    name: "坐牢卡",
+    percentage: 5
+  },
+  {
+    name: "倒霉卡",
+    percentage: 4
+  },
+  {
+    name: "卖地卡",
+    percentage: 2
+  },
+  {
+    name: "查税卡",
+    percentage: 5
+  }
+];
+export { characters, maps, seq, reverseSeq, cardsMap, cardsChance };
