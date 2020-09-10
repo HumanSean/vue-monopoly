@@ -69,7 +69,7 @@
           :key="index"
           @click="selectedPlayer = player"
           :style="{
-            borderColor: selectedPlayer === player ? 'teal' : '#454545'
+            borderColor: selectedPlayer === player ? '#320f83' : '#333335'
           }"
         >
           <div>
@@ -99,7 +99,7 @@
           :key="i"
           @click="selectedDice = i"
           :style="{
-            borderColor: selectedDice === i ? 'teal' : '#454545'
+            borderColor: selectedDice === i ? '#320f83' : '#333335'
           }"
         >
           <div>
@@ -388,7 +388,7 @@ export default {
         height: 120px;
         box-sizing: border-box;
         border-radius: 8px;
-        border: 3px solid #454545;
+        border: 3px solid #333335;
         cursor: pointer;
       }
       &.ban {
@@ -410,7 +410,7 @@ export default {
       }
       h4 {
         text-align: center;
-        color: #454545;
+        color: #333335;
       }
     }
   }

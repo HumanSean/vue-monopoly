@@ -164,7 +164,7 @@ export default {
     float: right;
     width: 38.1%;
     height: calc(100% - 65px);
-    border-left: 2px solid teal;
+    border-left: 2px solid #320f83;
   }
   h2 {
     margin: 10px;

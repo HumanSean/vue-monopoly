@@ -50,7 +50,7 @@
         :body-style="{ padding: '0px' }"
         :style="{ borderColor: players[0] ? players[0].color : '#fa4545' }"
       >
-        <h2 :style="{ background: players[0] ? players[0].color : '#454545' }">
+        <h2 :style="{ background: players[0] ? players[0].color : '#333335' }">
           {{ players[0] && players[0].chr }}
         </h2>
         <img
@@ -186,7 +186,7 @@ export default {
       position: relative;
       width: 70%;
       border-radius: 5px;
-      border: 2px solid #454545;
+      border: 2px solid #333335;
       box-sizing: border-box;
       cursor: pointer;
     }
@@ -248,7 +248,7 @@ export default {
       }
       h4 {
         text-align: center;
-        color: #454545;
+        color: #333335;
         font-weight: normal;
         font-size: 15px;
         height: 20px;

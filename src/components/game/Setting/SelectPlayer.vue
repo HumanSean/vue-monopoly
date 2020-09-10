@@ -134,7 +134,7 @@ export default {
       & {
         position: relative;
         width: 180px;
-        border: 2px solid teal;
+        border: 2px solid #320f83;
         border-radius: 5px;
       }
       img {

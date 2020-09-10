@@ -37,7 +37,7 @@ body,
 
 h2.title {
   display: inline-block;
-  background: teal;
+  background: #320f83;
   color: #fafafa;
   border-radius: 5px;
   padding: 7px 13px;
@@ -50,7 +50,7 @@ h2.title {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: teal;
+  background: #320f83;
 }
 
 .el-tag {

@@ -198,9 +198,9 @@ class LandBox extends Box {
       this.img = document.createElement("img");
     }
     // 划公共地界
-    this.node.style.border = "1px solid #454545";
-    this.node.firstElementChild.style.background = "#454545";
-    this.node.firstElementChild.style.borderColor = "#454545";
+    this.node.style.border = "1px solid #333335";
+    this.node.firstElementChild.style.background = "#333335";
+    this.node.firstElementChild.style.borderColor = "#333335";
     this.owner = "";
   }
   upgrade() {

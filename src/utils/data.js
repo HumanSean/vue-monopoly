@@ -420,4 +420,4 @@ const cardsChance = [
     percentage: 5
   }
 ];
-export { characters, maps, seq, reverseSeq, cardsMap, cardsChance };
+export { characters, names, maps, seq, reverseSeq, cardsMap, cardsChance };

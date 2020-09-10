@@ -1,5 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import Home from "../views/Home.vue";
 import Hall from "../views/Hall.vue";
 
 Vue.use(VueRouter);
@@ -7,7 +8,8 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    redirect: "/game"
+    component: Home
+    // redirect: "/game"
   },
   {
     path: "/hall",

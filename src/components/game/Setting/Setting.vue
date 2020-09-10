@@ -102,13 +102,13 @@ export default {
     transform: translate(-50%, -50%);
     width: 800px;
     height: 600px;
-    border: 2px solid teal;
+    border: 2px solid #320f83;
     border-radius: 5px;
   }
   h2 {
     padding: 13px;
     box-sizing: border-box;
-    background: teal;
+    background: #320f83;
     color: #fafafa;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;

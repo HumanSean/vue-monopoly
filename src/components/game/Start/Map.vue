@@ -83,7 +83,7 @@ export default {
     gap: 0px;
     overflow: hidden;
     box-sizing: border-box;
-    border: 1px solid #454545;
+    border: 1px solid #333335;
   }
   ::v-deep .box {
     & {
@@ -91,7 +91,7 @@ export default {
       height: 100%;
       width: 100%;
       text-align: center;
-      border: 1px solid #454545;
+      border: 1px solid #333335;
       box-sizing: border-box;
     }
     h2 {
@@ -103,10 +103,10 @@ export default {
       overflow: hidden;
       white-space: nowrap;
       text-align: center;
-      border-bottom: 2px solid #454545;
+      border-bottom: 2px solid #333335;
     }
     h3 {
-      color: #454545;
+      color: #333335;
       font-weight: 400;
       font-size: 15px;
       height: 30px;
@@ -138,7 +138,7 @@ export default {
     background-size: 100% 100%;
     grid-area: 2 / 2 / -2 / -2;
     box-sizing: border-box;
-    border: 1px solid #454545;
+    border: 1px solid #333335;
   }
 }
 @keyframes moving {
